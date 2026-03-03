@@ -1,0 +1,4 @@
+- [ ] `Assistant.java` updated with `@MemoryId`.
+- [ ] `AssistantConfiguration.java` updated with `ChatMemoryProvider` and `ChatMemoryStore`.
+- [ ] `AssistantController.java` updated to accept `sessionId` and handle concurrency.
+- [ ] Multi-user isolation verified (manual test or integration test).

@@ -1,0 +1,6 @@
+- [x] `TravelAssistant` 接口创建成功，Prompt 包含所有约束条件。
+- [x] `TravelController` 能够接收 `scene` 和 `nativeLanguage` 参数。
+- [x] API 返回标准的 JSON 格式数据。
+- [x] 返回的常用语数量为 10 条。
+- [x] 返回的常用语符合指定场景。
+- [x] 返回的常用语包含用户母语。

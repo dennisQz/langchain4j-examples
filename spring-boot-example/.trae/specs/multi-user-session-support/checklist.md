@@ -1,0 +1,11 @@
+- [x] Assistant interface method signature includes `@MemoryId String sessionId`.
+- [x] StreamingAssistant interface method signature includes `@MemoryId String sessionId`.
+- [x] TravelAssistant interface method signature includes `@MemoryId String sessionId`.
+- [x] ChatMemoryProvider bean is configured instead of ChatMemory bean in `AssistantConfiguration.java`.
+- [x] ChatMemoryProvider implementation creates separate `ChatMemory` instance for each unique ID.
+- [x] AssistantController passes `@RequestParam` sessionId to Assistant.
+- [x] AssistantController passes `@RequestParam` sessionId to StreamingAssistant.
+- [x] TravelController passes `@RequestParam` sessionId to TravelAssistant.
+- [x] TravelControllerTest passes correctly.
+- [x] TestAssistant implementation updated to match new interface signature.
+- [x] API endpoints `/assistant` and `/streamingAssistant` return distinct responses for different session IDs.

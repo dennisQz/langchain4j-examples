@@ -2,7 +2,45 @@
 GET http://localhost:8082/model?message=What is the capital of Germany?
 
 ### High Level API: AI Service with tools
-GET http://localhost:8082/assistant?message=What is the current time?
+GET http://localhost:8082/assistant?message=What is the current time?&sessionId=user1
 
 ### High Level API: Streaming AI Service with tools
-GET http://localhost:8082/streamingAssistant?message=What is the current time?
+GET http://localhost:8082/streamingAssistant?message=What is the current time?&sessionId=user2
+
+### High Level API: Travel Assistant (Success)
+# Expected Response:
+# {
+#   "code": 200,
+#   "data": {
+#     "phrases": [ ... ],
+#     "message": null
+#   }
+# }
+POST http://localhost:8082/travel/assistant
+Content-Type: application/json
+
+{
+  "scene": "Restaurant",
+  "targetLanguage": "Spanish",
+  "nativeLanguage": "English",
+  "sessionId": "traveler1"
+}
+
+### High Level API: Travel Assistant (Unclear Scenario / Error)
+# Expected Response:
+# {
+#   "code": 500,
+#   "data": {
+#     "phrases": null,
+#     "message": "请提供更具体的场景信息"
+#   }
+# }
+POST http://localhost:8082/travel/assistant
+Content-Type: application/json
+
+{
+  "scene": "Unclear",
+  "targetLanguage": "Spanish",
+  "nativeLanguage": "English",
+  "sessionId": "traveler2"
+}

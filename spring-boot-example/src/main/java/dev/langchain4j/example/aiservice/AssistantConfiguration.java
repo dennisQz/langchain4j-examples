@@ -2,15 +2,16 @@ package dev.langchain4j.example.aiservice;
 
 import dev.langchain4j.example.lowlevel.ChatModelController;
 import dev.langchain4j.memory.ChatMemory;
+import dev.langchain4j.memory.chat.ChatMemoryProvider;
 import dev.langchain4j.memory.chat.MessageWindowChatMemory;
 import dev.langchain4j.model.chat.ChatModel;
 import dev.langchain4j.model.chat.StreamingChatModel;
 import dev.langchain4j.model.chat.listener.ChatModelListener;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Scope;
 
-import static org.springframework.beans.factory.config.ConfigurableBeanFactory.SCOPE_PROTOTYPE;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Configuration
 public class AssistantConfiguration {
@@ -19,9 +20,9 @@ public class AssistantConfiguration {
      * This chat memory will be used by {@link Assistant} and {@link StreamingAssistant}
      */
     @Bean
-    @Scope(SCOPE_PROTOTYPE)
-    ChatMemory chatMemory() {
-        return MessageWindowChatMemory.withMaxMessages(10);
+    ChatMemoryProvider chatMemoryProvider() {
+        Map<Object, ChatMemory> memories = new ConcurrentHashMap<>();
+        return memoryId -> memories.computeIfAbsent(memoryId, id -> MessageWindowChatMemory.withMaxMessages(3));
     }
 
     /**
