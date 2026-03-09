@@ -1,0 +1,42 @@
+spring:
+  application:
+    name: LangChain4j Spring Boot Example
+  profiles:
+    active: default
+
+# 强制使用 UTF-8 编码处理 HTTP 请求和响应
+server:
+  port: 8082
+  servlet:
+    encoding:
+      charset: UTF-8
+      force: true
+      enabled: true
+
+logging:
+  level:
+    dev.langchain4j: DEBUG
+  charset:
+    console: UTF-8 # 设置控制台日志输出编码为 UTF-8
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  tracing:
+    sampling:
+      probability: 1.0
+
+app:
+  model:
+    current: qwen
+    openai:
+      api-key: sk-808701fbaed240688aaf3a075dad0a6b
+      model-name: gpt-4o-mini
+    qwen:
+      api-key: sk-808701fbaed240688aaf3a075dad0a6b
+      model-name: qwen-turbo
+    zhipu:
+      api-key: 0e9386d0c9c94ba5a1b5152ab7b5201d.kDinpqEd2QjwwTo7
+      model-name: glm-4
