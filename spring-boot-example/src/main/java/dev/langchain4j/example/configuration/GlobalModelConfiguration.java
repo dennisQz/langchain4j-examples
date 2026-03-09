@@ -73,10 +73,12 @@ public class GlobalModelConfiguration {
 
     @Bean("zhipuChatModel")
     public ChatModel zhipuChatModel(@Value("${app.model.zhipu.api-key}") String apiKey,
-                                    @Value("${app.model.zhipu.model-name:glm-4}") String modelName) {
+                                    @Value("${app.model.zhipu.model-name:glm-4.7}") String modelName,
+                                    @Value("${app.model.zhipu.max-tokens:4096}") Integer maxTokens) {
         return ZhipuAiChatModel.builder()
                 .apiKey(apiKey)
                 .model(modelName)
+                .maxToken(maxTokens)
                 .logRequests(true)
                 .logResponses(true)
                 .build();
@@ -84,10 +86,12 @@ public class GlobalModelConfiguration {
 
     @Bean("zhipuStreamingChatModel")
     public StreamingChatModel zhipuStreamingChatModel(@Value("${app.model.zhipu.api-key}") String apiKey,
-                                                      @Value("${app.model.zhipu.model-name:glm-4}") String modelName) {
+                                                      @Value("${app.model.zhipu.model-name:glm-4.7}") String modelName,
+                                                      @Value("${app.model.zhipu.max-tokens:4096}") Integer maxTokens) {
         return ZhipuAiStreamingChatModel.builder()
                 .apiKey(apiKey)
                 .model(modelName)
+                .maxToken(maxTokens)
                 .logRequests(true)
                 .logResponses(true)
                 .build();

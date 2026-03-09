@@ -39,4 +39,5 @@ app:
       model-name: qwen-turbo
     zhipu:
       api-key: 0e9386d0c9c94ba5a1b5152ab7b5201d.kDinpqEd2QjwwTo7
-      model-name: glm-4
+      model-name: glm-4.7
+      max-tokens: 4096
