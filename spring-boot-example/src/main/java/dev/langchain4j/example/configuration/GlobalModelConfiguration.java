@@ -29,10 +29,12 @@ public class GlobalModelConfiguration {
 
     @Bean("openaiChatModel")
     public ChatModel openaiChatModel(@Value("${app.model.openai.api-key}") String apiKey,
-                                     @Value("${app.model.openai.model-name:gpt-4o-mini}") String modelName) {
+                                     @Value("${app.model.openai.model-name:gpt-4o-mini}") String modelName,
+                                     @Value("${app.model.temperature:0.9}") Double temperature) {
         return OpenAiChatModel.builder()
                 .apiKey(apiKey)
                 .modelName(modelName)
+                .temperature(temperature)
                 .logRequests(true)
                 .logResponses(true)
                 .build();
@@ -40,10 +42,12 @@ public class GlobalModelConfiguration {
 
     @Bean("openaiStreamingChatModel")
     public StreamingChatModel openaiStreamingChatModel(@Value("${app.model.openai.api-key}") String apiKey,
-                                                       @Value("${app.model.openai.model-name:gpt-4o-mini}") String modelName) {
+                                                       @Value("${app.model.openai.model-name:gpt-4o-mini}") String modelName,
+                                                       @Value("${app.model.temperature:0.9}") Double temperature) {
         return OpenAiStreamingChatModel.builder()
                 .apiKey(apiKey)
                 .modelName(modelName)
+                .temperature(temperature)
                 .logRequests(true)
                 .logResponses(true)
                 .build();
@@ -52,10 +56,12 @@ public class GlobalModelConfiguration {
     @Bean("customQwenChatModel")
     public ChatModel qwenChatModel(@Value("${app.model.qwen.api-key}") String apiKey,
                                    @Value("${app.model.qwen.model-name:qwen-turbo}") String modelName,
+                                   @Value("${app.model.temperature:0.9}") Double temperature,
                                    ChatModelListener listener) {
         return QwenChatModel.builder()
                 .apiKey(apiKey)
                 .modelName(modelName)
+                .temperature(temperature.floatValue())
                 .listeners(List.of(listener))
                 .build();
     }
@@ -63,10 +69,12 @@ public class GlobalModelConfiguration {
     @Bean("customQwenStreamingChatModel")
     public StreamingChatModel qwenStreamingChatModel(@Value("${app.model.qwen.api-key}") String apiKey,
                                                      @Value("${app.model.qwen.model-name:qwen-turbo}") String modelName,
+                                                     @Value("${app.model.temperature:0.9}") Double temperature,
                                                      ChatModelListener listener) {
         return QwenStreamingChatModel.builder()
                 .apiKey(apiKey)
                 .modelName(modelName)
+                .temperature(temperature.floatValue())
                 .listeners(List.of(listener))
                 .build();
     }
@@ -74,11 +82,13 @@ public class GlobalModelConfiguration {
     @Bean("zhipuChatModel")
     public ChatModel zhipuChatModel(@Value("${app.model.zhipu.api-key}") String apiKey,
                                     @Value("${app.model.zhipu.model-name:glm-4.7}") String modelName,
-                                    @Value("${app.model.zhipu.max-tokens:4096}") Integer maxTokens) {
+                                    @Value("${app.model.zhipu.max-tokens:4096}") Integer maxTokens,
+                                    @Value("${app.model.temperature:0.9}") Double temperature) {
         return ZhipuAiChatModel.builder()
                 .apiKey(apiKey)
                 .model(modelName)
                 .maxToken(maxTokens)
+                .temperature(temperature)
                 .logRequests(true)
                 .logResponses(true)
                 .build();
@@ -87,11 +97,13 @@ public class GlobalModelConfiguration {
     @Bean("zhipuStreamingChatModel")
     public StreamingChatModel zhipuStreamingChatModel(@Value("${app.model.zhipu.api-key}") String apiKey,
                                                       @Value("${app.model.zhipu.model-name:glm-4.7}") String modelName,
-                                                      @Value("${app.model.zhipu.max-tokens:4096}") Integer maxTokens) {
+                                                      @Value("${app.model.zhipu.max-tokens:4096}") Integer maxTokens,
+                                                      @Value("${app.model.temperature:0.9}") Double temperature) {
         return ZhipuAiStreamingChatModel.builder()
                 .apiKey(apiKey)
                 .model(modelName)
                 .maxToken(maxTokens)
+                .temperature(temperature)
                 .logRequests(true)
                 .logResponses(true)
                 .build();

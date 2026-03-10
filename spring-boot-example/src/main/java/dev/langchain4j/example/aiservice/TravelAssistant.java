@@ -32,6 +32,7 @@ public interface TravelAssistant {
                - 如果目标语是英语，则 'phonetic' 应为 IPA 音标。
                - 当无法检测到用户输入信息的真实意图或场景不明确时，返回包含 'message' 字段的JSON，提示用户提供更清晰的信息（例如："请提供更具体的场景信息"）。
             5. **数量限制**：严格生成10条。
+            6. **多样性**：如果用户在同一会话中重复询问相同场景，请务必生成与之前**不同**的短语，以扩展用户的词汇量。
             """)
     @UserMessage("请为场景【{{scene}}】生成10条【{{nativeLanguage}}】常用语，并翻译为【{{targetLanguage}}】。")
     TravelResponse chat(@MemoryId String sessionId, @V("scene") String scene, @V("targetLanguage") String targetLanguage, @V("nativeLanguage") String nativeLanguage);
