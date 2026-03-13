@@ -4,6 +4,7 @@ import dev.langchain4j.example.aiservice.model.TravelPhrase;
 import dev.langchain4j.example.aiservice.model.TravelResponse;
 import dev.langchain4j.example.configuration.ModelSelector;
 import dev.langchain4j.example.service.ModelSelectionStrategy;
+import dev.langchain4j.example.service.PromptManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,10 +13,10 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.util.Collections;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -36,9 +37,14 @@ class TravelControllerTest {
     @MockBean
     private ModelSelectionStrategy modelSelectionStrategy;
 
+    @MockBean
+    private PromptManager promptManager;
+
     @BeforeEach
     void setUp() {
         given(modelSelectionStrategy.selectModel(anyString(), anyString())).willReturn("openai");
+        given(promptManager.loadPrompt(anyString(), anyString(), eq("system"))).willReturn("System Prompt");
+        given(promptManager.loadPrompt(anyString(), anyString(), eq("user"))).willReturn("User Prompt for {{scene}}");
     }
 
     @Test
@@ -47,7 +53,7 @@ class TravelControllerTest {
         TravelPhrase phrase = new TravelPhrase("Hello", "Bonjour");
         TravelResponse response = new TravelResponse(List.of(phrase));
 
-        given(travelAssistant.chat("default", "Paris", "French", "English")).willReturn(response);
+        given(travelAssistant.chat(eq("default"), eq("System Prompt"), anyString())).willReturn(response);
 
         // Perform request
         mockMvc.perform(post("/travel/assistant")
@@ -65,7 +71,7 @@ class TravelControllerTest {
         TravelPhrase phrase = new TravelPhrase("Hello", "Bonjour");
         TravelResponse response = new TravelResponse(List.of(phrase));
 
-        given(travelAssistant.chat("traveler1", "Paris", "French", "English")).willReturn(response);
+        given(travelAssistant.chat(eq("traveler1"), eq("System Prompt"), anyString())).willReturn(response);
 
         // Perform request
         mockMvc.perform(post("/travel/assistant")
@@ -82,7 +88,7 @@ class TravelControllerTest {
         // Mock data
         TravelResponse response = new TravelResponse("Please provide more specific scene information.");
 
-        given(travelAssistant.chat("default", "Unknown", "French", "English")).willReturn(response);
+        given(travelAssistant.chat(eq("default"), eq("System Prompt"), anyString())).willReturn(response);
 
         // Perform request
         mockMvc.perform(post("/travel/assistant")
@@ -99,7 +105,7 @@ class TravelControllerTest {
         TravelPhrase phrase = new TravelPhrase("Hello", "你好", "Ni Hao");
         TravelResponse response = new TravelResponse(List.of(phrase));
 
-        given(travelAssistant.chat("default", "Beijing", "Chinese", "English")).willReturn(response);
+        given(travelAssistant.chat(eq("default"), eq("System Prompt"), anyString())).willReturn(response);
 
         // Perform request
         mockMvc.perform(post("/travel/assistant")

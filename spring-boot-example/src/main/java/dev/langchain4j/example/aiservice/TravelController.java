@@ -5,9 +5,14 @@ import dev.langchain4j.example.aiservice.model.TravelRequest;
 import dev.langchain4j.example.aiservice.model.TravelResponse;
 import dev.langchain4j.example.configuration.ModelSelector;
 import dev.langchain4j.example.service.ModelSelectionStrategy;
+import dev.langchain4j.example.service.PromptManager;
+import dev.langchain4j.model.input.PromptTemplate;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @RestController
 public class TravelController {
@@ -15,13 +20,16 @@ public class TravelController {
     private final TravelAssistant travelAssistant;
     private final ModelSelector modelSelector;
     private final ModelSelectionStrategy modelSelectionStrategy;
+    private final PromptManager promptManager;
 
     public TravelController(TravelAssistant travelAssistant,
                             ModelSelector modelSelector,
-                            ModelSelectionStrategy modelSelectionStrategy) {
+                            ModelSelectionStrategy modelSelectionStrategy,
+                            PromptManager promptManager) {
         this.travelAssistant = travelAssistant;
         this.modelSelector = modelSelector;
         this.modelSelectionStrategy = modelSelectionStrategy;
+        this.promptManager = promptManager;
     }
 
     @PostMapping("/travel/assistant")
@@ -33,7 +41,20 @@ public class TravelController {
         modelSelector.setContextModel(selectedModel);
 
         try {
-            TravelResponse response = travelAssistant.chat(sessionId, request.getScene(), request.getTargetLanguage(), request.getNativeLanguage());
+            // Load prompts
+            String systemPrompt = promptManager.loadPrompt("travel", selectedModel, "system");
+            String userPromptTemplate = promptManager.loadPrompt("travel", selectedModel, "user");
+
+            // Fill user prompt template
+            Map<String, Object> variables = new HashMap<>();
+            variables.put("scene", request.getScene());
+            variables.put("targetLanguage", request.getTargetLanguage());
+            variables.put("nativeLanguage", request.getNativeLanguage());
+            
+            PromptTemplate template = PromptTemplate.from(userPromptTemplate);
+            String userMessage = template.apply(variables).text();
+
+            TravelResponse response = travelAssistant.chat(sessionId, systemPrompt, userMessage);
 
             if (response.getMessage() != null && !response.getMessage().isEmpty() && (response.getPhrases() == null || response.getPhrases().isEmpty())) {
                 return ApiResponse.error(500, response);
