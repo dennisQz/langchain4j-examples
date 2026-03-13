@@ -2,6 +2,9 @@ package dev.langchain4j.example.aiservice;
 
 import dev.langchain4j.example.aiservice.model.TravelPhrase;
 import dev.langchain4j.example.aiservice.model.TravelResponse;
+import dev.langchain4j.example.configuration.ModelSelector;
+import dev.langchain4j.example.service.ModelSelectionStrategy;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -12,6 +15,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.util.Collections;
 import java.util.List;
 
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -25,6 +29,17 @@ class TravelControllerTest {
 
     @MockBean
     private TravelAssistant travelAssistant;
+
+    @MockBean
+    private ModelSelector modelSelector;
+
+    @MockBean
+    private ModelSelectionStrategy modelSelectionStrategy;
+
+    @BeforeEach
+    void setUp() {
+        given(modelSelectionStrategy.selectModel(anyString(), anyString())).willReturn("openai");
+    }
 
     @Test
     void testChat() throws Exception {
