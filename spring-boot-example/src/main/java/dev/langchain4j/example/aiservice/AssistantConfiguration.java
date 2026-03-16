@@ -35,18 +35,19 @@ public class AssistantConfiguration {
     private final ChatMemoryRepository chatMemoryRepository;
     private final ObjectMapper objectMapper;
 
-    public AssistantConfiguration(ChatMemoryRepository chatMemoryRepository, ObjectMapper objectMapper) {
+    public AssistantConfiguration(ChatMemoryRepository chatMemoryRepository) {
         this.chatMemoryRepository = chatMemoryRepository;
-        this.objectMapper = objectMapper;
-        configureObjectMapper();
+        this.objectMapper = createObjectMapper();
     }
 
-    private void configureObjectMapper() {
-        objectMapper.activateDefaultTyping(
+    private ObjectMapper createObjectMapper() {
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.activateDefaultTyping(
                 LaissezFaireSubTypeValidator.instance,
                 ObjectMapper.DefaultTyping.NON_FINAL,
                 JsonTypeInfo.As.PROPERTY
         );
+        return mapper;
     }
 
     @Bean
