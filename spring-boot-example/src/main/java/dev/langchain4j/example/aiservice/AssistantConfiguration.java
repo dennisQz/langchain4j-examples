@@ -1,10 +1,13 @@
 package dev.langchain4j.example.aiservice;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.jsontype.impl.LaissezFaireSubTypeValidator;
 import dev.langchain4j.example.configuration.entity.ChatMemoryEntity;
 import dev.langchain4j.example.configuration.repository.ChatMemoryRepository;
@@ -42,6 +45,12 @@ public class AssistantConfiguration {
 
     private ObjectMapper createObjectMapper() {
         ObjectMapper mapper = new ObjectMapper();
+        // Allow Jackson to see private fields in ChatMessage implementations
+        mapper.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.NONE);
+        mapper.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
+        // Avoid exception if a bean is empty
+        mapper.disable(SerializationFeature.FAIL_ON_EMPTY_BEANS);
+        // Enable polymorphic type handling for List<ChatMessage>
         mapper.activateDefaultTyping(
                 LaissezFaireSubTypeValidator.instance,
                 ObjectMapper.DefaultTyping.NON_FINAL,
