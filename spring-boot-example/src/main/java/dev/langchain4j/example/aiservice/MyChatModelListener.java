@@ -13,16 +13,44 @@ public class MyChatModelListener implements ChatModelListener {
 
     @Override
     public void onRequest(ChatModelRequestContext requestContext) {
-        log.info("onRequest(): {}", requestContext.chatRequest());
+        requestContext.attributes().put("start_time", System.nanoTime());
+        log.info("onRequest(): [Request ID: {}] Model: {}, Request: {}", 
+            requestContext.chatRequest().hashCode(), 
+            requestContext.chatRequest().modelName(),
+            requestContext.chatRequest());
     }
 
     @Override
     public void onResponse(ChatModelResponseContext responseContext) {
-        log.info("onResponse(): {}", responseContext.chatResponse());
+        long startTime = (long) responseContext.attributes().get("start_time");
+        long endTime = System.nanoTime();
+        double durationMs = (endTime - startTime) / 1_000_000.0;
+
+        log.info("onResponse(): [Request ID: {}] Total Duration: {} ms", 
+            responseContext.chatRequest().hashCode(),
+            String.format("%.2f", durationMs));
+        
+        log.info("Response: {}", responseContext.chatResponse());
+        
+        if (responseContext.chatResponse().tokenUsage() != null) {
+            log.info("Token Usage: {}", responseContext.chatResponse().tokenUsage());
+        }
+
+        if (responseContext.chatResponse().metadata() != null) {
+            log.info("Response Metadata: {}", responseContext.chatResponse().metadata());
+        }
     }
 
     @Override
     public void onError(ChatModelErrorContext errorContext) {
-        log.info("onError(): {}", errorContext.error().getMessage());
+        long startTime = (long) errorContext.attributes().get("start_time");
+        long endTime = System.nanoTime();
+        double durationMs = (endTime - startTime) / 1_000_000.0;
+
+        log.error("onError(): [Request ID: {}] Duration until error: {} ms, Error: {}", 
+            errorContext.chatRequest().hashCode(),
+            String.format("%.2f", durationMs),
+            errorContext.error().getMessage(), 
+            errorContext.error());
     }
 }
