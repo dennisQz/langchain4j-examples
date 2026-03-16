@@ -14,6 +14,9 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 @RestController
 public class TravelController {
 
@@ -21,6 +24,9 @@ public class TravelController {
     private final ModelSelector modelSelector;
     private final ModelSelectionStrategy modelSelectionStrategy;
     private final PromptManager promptManager;
+
+    private static final Logger log = LoggerFactory.getLogger(TravelController.class);
+
 
     public TravelController(TravelAssistant travelAssistant,
                             ModelSelector modelSelector,
@@ -59,6 +65,7 @@ public class TravelController {
             if (response.getMessage() != null && !response.getMessage().isEmpty() && (response.getPhrases() == null || response.getPhrases().isEmpty())) {
                 return ApiResponse.error(500, response);
             }
+            log.info("请求结束###############################################");
 
             return ApiResponse.success(response);
         } finally {
