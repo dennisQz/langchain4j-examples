@@ -1,27 +1,17 @@
 package dev.langchain4j.example.aiservice;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonSubTypes;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import com.fasterxml.jackson.annotation.PropertyAccessor;
+import com.fasterxml.jackson.annotation.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.databind.jsontype.impl.LaissezFaireSubTypeValidator;
+import dev.langchain4j.data.message.*;
 import dev.langchain4j.example.configuration.entity.ChatMemoryEntity;
 import dev.langchain4j.example.configuration.repository.ChatMemoryRepository;
-import dev.langchain4j.example.lowlevel.ChatModelController;
 import dev.langchain4j.memory.ChatMemory;
 import dev.langchain4j.memory.chat.ChatMemoryProvider;
 import dev.langchain4j.memory.chat.MessageWindowChatMemory;
-import dev.langchain4j.model.chat.ChatModel;
-import dev.langchain4j.model.chat.StreamingChatModel;
 import dev.langchain4j.model.chat.listener.ChatModelListener;
-import dev.langchain4j.data.message.AiMessage;
-import dev.langchain4j.data.message.ChatMessage;
-import dev.langchain4j.data.message.SystemMessage;
-import dev.langchain4j.data.message.UserMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
@@ -50,14 +40,31 @@ public class AssistantConfiguration {
         mapper.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
         // Avoid exception if a bean is empty
         mapper.disable(SerializationFeature.FAIL_ON_EMPTY_BEANS);
-        // Enable polymorphic type handling for List<ChatMessage>
-        mapper.activateDefaultTyping(
-                LaissezFaireSubTypeValidator.instance,
-                ObjectMapper.DefaultTyping.NON_FINAL,
-                JsonTypeInfo.As.PROPERTY
-        );
+        
+        // Register Mixins to use simple "type" field instead of full class names
+        mapper.addMixIn(ChatMessage.class, ChatMessageMixin.class);
+        mapper.addMixIn(Content.class, ContentMixin.class);
+        
         return mapper;
     }
+
+    // Define polymorphic handling for ChatMessage using Mixin
+    @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
+    @JsonSubTypes({
+            @JsonSubTypes.Type(value = SystemMessage.class, name = "system"),
+            @JsonSubTypes.Type(value = UserMessage.class, name = "user"),
+            @JsonSubTypes.Type(value = AiMessage.class, name = "ai"),
+            @JsonSubTypes.Type(value = ToolExecutionResultMessage.class, name = "tool")
+    })
+    abstract static class ChatMessageMixin {}
+
+    // Define polymorphic handling for Content (used in UserMessage)
+    @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
+    @JsonSubTypes({
+            @JsonSubTypes.Type(value = TextContent.class, name = "text"),
+            @JsonSubTypes.Type(value = ImageContent.class, name = "image")
+    })
+    abstract static class ContentMixin {}
 
     @Bean
     ChatMemoryProvider chatMemoryProvider() {

@@ -48,7 +48,7 @@ app:
       model-name: gpt-4o-mini
     qwen:
       api-key: sk-808701fbaed240688aaf3a075dad0a6b
-      model-name: qwen-turbo
+      model-name: qwen-plus # qwen3.5-plus or qwen-turbo
     zhipu:
       api-key: 0e9386d0c9c94ba5a1b5152ab7b5201d.kDinpqEd2QjwwTo7
       model-name: glm-4.7
