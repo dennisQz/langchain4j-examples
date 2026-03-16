@@ -1,5 +1,13 @@
 package dev.langchain4j.example.aiservice;
 
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.jsontype.impl.LaissezFaireSubTypeValidator;
+import dev.langchain4j.example.configuration.entity.ChatMemoryEntity;
+import dev.langchain4j.example.configuration.repository.ChatMemoryRepository;
 import dev.langchain4j.example.lowlevel.ChatModelController;
 import dev.langchain4j.memory.ChatMemory;
 import dev.langchain4j.memory.chat.ChatMemoryProvider;
@@ -7,32 +15,120 @@ import dev.langchain4j.memory.chat.MessageWindowChatMemory;
 import dev.langchain4j.model.chat.ChatModel;
 import dev.langchain4j.model.chat.StreamingChatModel;
 import dev.langchain4j.model.chat.listener.ChatModelListener;
+import dev.langchain4j.data.message.AiMessage;
+import dev.langchain4j.data.message.ChatMessage;
+import dev.langchain4j.data.message.SystemMessage;
+import dev.langchain4j.data.message.UserMessage;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.ArrayList;
+import java.util.List;
 
 @Configuration
 public class AssistantConfiguration {
 
-    /**
-     * This chat memory will be used by {@link Assistant} and {@link StreamingAssistant}
-     */
-    @Bean
-    ChatMemoryProvider chatMemoryProvider() {
-        Map<Object, ChatMemory> memories = new ConcurrentHashMap<>();
-        return memoryId -> memories.computeIfAbsent(memoryId, id -> MessageWindowChatMemory.withMaxMessages(3));
+    private static final Logger log = LoggerFactory.getLogger(AssistantConfiguration.class);
+
+    private final ChatMemoryRepository chatMemoryRepository;
+    private final ObjectMapper objectMapper;
+
+    public AssistantConfiguration(ChatMemoryRepository chatMemoryRepository, ObjectMapper objectMapper) {
+        this.chatMemoryRepository = chatMemoryRepository;
+        this.objectMapper = objectMapper;
+        configureObjectMapper();
     }
 
-    /**
-     * This listener will be injected into every {@link ChatModel} and {@link StreamingChatModel}
-     * bean   found in the application context.
-     * It will listen for {@link ChatModel} in the {@link ChatModelController} as well as
-     * {@link Assistant} and {@link StreamingAssistant}.
-     */
+    private void configureObjectMapper() {
+        objectMapper.activateDefaultTyping(
+                LaissezFaireSubTypeValidator.instance,
+                ObjectMapper.DefaultTyping.NON_FINAL,
+                JsonTypeInfo.As.PROPERTY
+        );
+    }
+
+    @Bean
+    ChatMemoryProvider chatMemoryProvider() {
+        return memoryId -> {
+            String sessionId = String.valueOf(memoryId);
+            ChatMemoryEntity entity = chatMemoryRepository.findBySessionId(sessionId).orElse(null);
+
+            List<ChatMessage> messages = new ArrayList<>();
+            if (entity != null && entity.getChatMemoryJson() != null && !entity.getChatMemoryJson().isEmpty()) {
+                try {
+                    messages = objectMapper.readValue(entity.getChatMemoryJson(), new TypeReference<List<ChatMessage>>() {});
+                    log.info("Loaded {} messages from database for session: {}", messages.size(), sessionId);
+                } catch (JsonProcessingException e) {
+                    log.warn("Failed to deserialize chat memory for session: {}, will start with empty memory. Error: {}", sessionId, e.getMessage());
+                    messages = new ArrayList<>();
+                }
+            }
+
+            ChatMemory chatMemory = MessageWindowChatMemory.withMaxMessages(3);
+            for (ChatMessage message : messages) {
+                chatMemory.add(message);
+            }
+
+            return new PersistentChatMemoryWrapper(chatMemory, sessionId, chatMemoryRepository, objectMapper);
+        };
+    }
+
     @Bean
     ChatModelListener chatModelListener() {
         return new MyChatModelListener();
+    }
+
+    private static class PersistentChatMemoryWrapper implements ChatMemory {
+
+        private final ChatMemory delegate;
+        private final String sessionId;
+        private final ChatMemoryRepository repository;
+        private final ObjectMapper objectMapper;
+
+        public PersistentChatMemoryWrapper(ChatMemory delegate, String sessionId,
+                                           ChatMemoryRepository repository, ObjectMapper objectMapper) {
+            this.delegate = delegate;
+            this.sessionId = sessionId;
+            this.repository = repository;
+            this.objectMapper = objectMapper;
+        }
+
+        @Override
+        public String id() {
+            return sessionId;
+        }
+
+        @Override
+        public void add(ChatMessage message) {
+            delegate.add(message);
+            persist();
+        }
+
+        @Override
+        public List<ChatMessage> messages() {
+            return delegate.messages();
+        }
+
+        @Override
+        public void clear() {
+            delegate.clear();
+            persist();
+        }
+
+        private void persist() {
+            try {
+                String json = objectMapper.writeValueAsString(delegate.messages());
+                ChatMemoryEntity entity = repository.findBySessionId(sessionId)
+                        .orElse(new ChatMemoryEntity());
+                entity.setSessionId(sessionId);
+                entity.setChatMemoryJson(json);
+                repository.save(entity);
+                log.debug("Persisted chat memory for session: {}", sessionId);
+            } catch (JsonProcessingException e) {
+                log.error("Failed to serialize chat memory for session: {}", sessionId, e);
+            }
+        }
     }
 }
