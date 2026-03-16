@@ -56,11 +56,14 @@ public class GlobalModelConfiguration {
     @Bean("customQwenChatModel")
     public ChatModel qwenChatModel(@Value("${app.model.qwen.api-key}") String apiKey,
                                    @Value("${app.model.qwen.model-name:qwen-turbo}") String modelName,
+                                   @Value("${app.model.qwen.max-tokens:2000}") Integer maxTokens,
                                    @Value("${app.model.temperature:0.9}") Double temperature,
                                    ChatModelListener listener) {
         return QwenChatModel.builder()
                 .apiKey(apiKey)
                 .modelName(modelName)
+                .topP(1.0)
+                .maxTokens(maxTokens)
                 .temperature(temperature.floatValue())
                 .listeners(List.of(listener))
                 .build();
@@ -69,11 +72,14 @@ public class GlobalModelConfiguration {
     @Bean("customQwenStreamingChatModel")
     public StreamingChatModel qwenStreamingChatModel(@Value("${app.model.qwen.api-key}") String apiKey,
                                                      @Value("${app.model.qwen.model-name:qwen-turbo}") String modelName,
+                                                     @Value("${app.model.qwen.max-tokens:2000}") Integer maxTokens,
                                                      @Value("${app.model.temperature:0.9}") Double temperature,
                                                      ChatModelListener listener) {
         return QwenStreamingChatModel.builder()
                 .apiKey(apiKey)
                 .modelName(modelName)
+                .topP(1.0)
+                .maxTokens(maxTokens)
                 .temperature(temperature.floatValue())
                 .listeners(List.of(listener))
                 .build();
