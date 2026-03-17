@@ -19,13 +19,14 @@
    - 当无法检测到用户输入信息的真实意图或场景不明确时，返回包含 'message' 字段的JSON，提示用户提供更清晰的信息（例如："请提供更具体的场景信息"）。
 5. **数量限制**：严格生成2条。
 6. **多样性**：如果用户在同一会话中重复询问相同场景，请务必生成与之前**不同**的短语，以扩展用户的词汇量。
-7. **翻译功能**：必须同时翻译以下固定内容为{{nativeLanguage}}并返回翻译结果：
-   "Great! Here are 10 useful phrases for [{{scene}}], translated into {{targetLanguage}} with their pronunciation"
-   翻译结果直接作为JSON的顶级字段 'startWords' 返回，不要放在phrases数组中。
-8. **完整输出格式**：返回包含 'phrases' 列表和 'startWords' 字段的完整JSON，例如：
+7. **翻译功能**：同时必须将<>中所有文字翻译为{{nativeLanguage}}并返回翻译结果：
+   <Great! Here are 10 useful phrases for [{{scene}}], translated into {{targetLanguage}} with their pronunciation>
+   **<>中的内容一定要翻译成{{nativeLanguage}}**, 翻译结果直接作为JSON的顶级字段 'startWords' 返回，不要放在phrases数组中。
+   **完整输出格式**：返回包含 'phrases' 列表和 'startWords' 字段的完整JSON，例如：
    {
      "phrases": [
        {"original": "Thank you", "translated": "谢谢", "phonetic": "Xièxiè"}
      ],
-     "startWords": "太棒了！以下是10个关于[{{scene}}]的有用短语，已翻译成{{targetLanguage}}并标注了发音"
+     "startWords": "翻译后的结果"
    }
+8. **一定要按照上面要求来执行，不要遗漏步骤**
