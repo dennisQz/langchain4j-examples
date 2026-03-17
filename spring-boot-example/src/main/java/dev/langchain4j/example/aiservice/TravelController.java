@@ -67,10 +67,13 @@ public class TravelController {
             variables.put("targetLanguage", targetLanguageName);
             variables.put("nativeLanguage", nativeLanguageName);
             
+            PromptTemplate sysTemplate = PromptTemplate.from(systemPrompt);
+            String systemMessage = sysTemplate.apply(variables).text();
+
             PromptTemplate template = PromptTemplate.from(userPromptTemplate);
             String userMessage = template.apply(variables).text();
 
-            TravelResponse response = travelAssistant.chat(sessionId, systemPrompt, userMessage);
+            TravelResponse response = travelAssistant.chat(sessionId, systemMessage, userMessage);
 
             if (response.getMessage() != null && !response.getMessage().isEmpty() && (response.getPhrases() == null || response.getPhrases().isEmpty())) {
                 return ApiResponse.error(500, response);

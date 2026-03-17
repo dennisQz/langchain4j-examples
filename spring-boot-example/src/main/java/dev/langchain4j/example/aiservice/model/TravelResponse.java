@@ -5,6 +5,7 @@ import java.util.List;
 public class TravelResponse {
     private List<TravelPhrase> phrases;
     private String message;
+    private String startWords;
 
     public TravelResponse() {
     }
@@ -31,5 +32,13 @@ public class TravelResponse {
 
     public void setMessage(String message) {
         this.message = message;
+    }
+
+    public String getStartWords() {
+        return startWords;
+    }
+
+    public void setStartWords(String startWords) {
+        this.startWords = startWords;
     }
 }
