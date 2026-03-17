@@ -4,6 +4,7 @@ import dev.langchain4j.example.aiservice.common.ApiResponse;
 import dev.langchain4j.example.aiservice.model.TravelRequest;
 import dev.langchain4j.example.aiservice.model.TravelResponse;
 import dev.langchain4j.example.configuration.ModelSelector;
+import dev.langchain4j.example.service.LanguageMappingService;
 import dev.langchain4j.example.service.ModelSelectionStrategy;
 import dev.langchain4j.example.service.PromptManager;
 import dev.langchain4j.model.input.PromptTemplate;
@@ -24,6 +25,7 @@ public class TravelController {
     private final ModelSelector modelSelector;
     private final ModelSelectionStrategy modelSelectionStrategy;
     private final PromptManager promptManager;
+    private final LanguageMappingService languageMappingService;
 
     private static final Logger log = LoggerFactory.getLogger(TravelController.class);
 
@@ -31,11 +33,13 @@ public class TravelController {
     public TravelController(TravelAssistant travelAssistant,
                             ModelSelector modelSelector,
                             ModelSelectionStrategy modelSelectionStrategy,
-                            PromptManager promptManager) {
+                            PromptManager promptManager,
+                            LanguageMappingService languageMappingService) {
         this.travelAssistant = travelAssistant;
         this.modelSelector = modelSelector;
         this.modelSelectionStrategy = modelSelectionStrategy;
         this.promptManager = promptManager;
+        this.languageMappingService = languageMappingService;
     }
 
     @PostMapping("/travel/assistant")
@@ -51,11 +55,17 @@ public class TravelController {
             String systemPrompt = promptManager.loadPrompt("travel", selectedModel, "system");
             String userPromptTemplate = promptManager.loadPrompt("travel", selectedModel, "user");
 
+            // Convert language codes to language names
+            String targetLanguageName = languageMappingService.getLanguageName(request.getTargetLanguage());
+            String nativeLanguageName = languageMappingService.getLanguageName(request.getNativeLanguage());
+            log.info("语言映射: targetLanguage [{}] -> [{}], nativeLanguage [{}] -> [{}]",
+                    request.getTargetLanguage(), targetLanguageName, request.getNativeLanguage(), nativeLanguageName);
+
             // Fill user prompt template
             Map<String, Object> variables = new HashMap<>();
             variables.put("scene", request.getScene());
-            variables.put("targetLanguage", request.getTargetLanguage());
-            variables.put("nativeLanguage", request.getNativeLanguage());
+            variables.put("targetLanguage", targetLanguageName);
+            variables.put("nativeLanguage", nativeLanguageName);
             
             PromptTemplate template = PromptTemplate.from(userPromptTemplate);
             String userMessage = template.apply(variables).text();
