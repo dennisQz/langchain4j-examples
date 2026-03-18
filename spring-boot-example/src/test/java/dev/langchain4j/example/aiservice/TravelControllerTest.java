@@ -1,5 +1,7 @@
 package dev.langchain4j.example.aiservice;
 
+import dev.langchain4j.example.aiservice.model.SceneTranslationPhrase;
+import dev.langchain4j.example.aiservice.model.SceneTranslationResponse;
 import dev.langchain4j.example.aiservice.model.TravelPhrase;
 import dev.langchain4j.example.aiservice.model.TravelResponse;
 import dev.langchain4j.example.configuration.ModelSelector;
@@ -149,8 +151,8 @@ class TravelControllerTest {
 
         given(scenePhraseService.getPhrasesBySceneId("1")).willReturn(chinesePhrases);
 
-        TravelPhrase phrase = new TravelPhrase("请问有预订吗", "Do you have a reservation?", "すみません、ご予約はありますか？", null);
-        TravelResponse response = new TravelResponse(List.of(phrase));
+        SceneTranslationPhrase phrase = new SceneTranslationPhrase("Do you have a reservation?", "すみません、ご予約はありますか？");
+        SceneTranslationResponse response = new SceneTranslationResponse(List.of(phrase));
 
         given(translateScenesAssistant.translate(eq("default_translate"), eq("Translate System Prompt"), anyString())).willReturn(response);
 
@@ -159,7 +161,6 @@ class TravelControllerTest {
                 .content("{\"sceneId\": \"1\", \"targetLanguage\": \"Japanese\", \"nativeLanguage\": \"English\"}"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(200))
-                .andExpect(jsonPath("$.data.phrases[0].defaultPhrase").value("请问有预订吗"))
                 .andExpect(jsonPath("$.data.phrases[0].original").value("Do you have a reservation?"))
                 .andExpect(jsonPath("$.data.phrases[0].translated").value("すみません、ご予約はありますか？"));
 
@@ -188,8 +189,8 @@ class TravelControllerTest {
 
         given(scenePhraseService.getPhrasesBySceneId("1")).willReturn(chinesePhrases);
 
-        TravelPhrase phrase = new TravelPhrase("请问有预订吗", "Do you have a reservation?", "すみません、ご予約はありますか？", null);
-        TravelResponse response = new TravelResponse(List.of(phrase));
+        SceneTranslationPhrase phrase = new SceneTranslationPhrase("Do you have a reservation?", "すみません、ご予約はありますか？");
+        SceneTranslationResponse response = new SceneTranslationResponse(List.of(phrase));
 
         given(translateScenesAssistant.translate(eq("mysession_translate"), eq("Translate System Prompt"), anyString())).willReturn(response);
 

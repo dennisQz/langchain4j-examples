@@ -126,7 +126,7 @@
 ```java
 @Bean
 ChatMemoryProvider ephemeralChatMemoryProvider() {
-    return memoryId -> MessageWindowChatMemory.withMaxMessages(10);
+    return memoryId -> MessageWindowChatMemory.withMaxMessages(1);
 }
 ```
 

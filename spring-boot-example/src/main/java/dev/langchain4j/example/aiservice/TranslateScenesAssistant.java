@@ -1,5 +1,6 @@
 package dev.langchain4j.example.aiservice;
 
+import dev.langchain4j.example.aiservice.model.SceneTranslationResponse;
 import dev.langchain4j.example.aiservice.model.TravelResponse;
 import dev.langchain4j.service.MemoryId;
 import dev.langchain4j.service.SystemMessage;
@@ -14,5 +15,5 @@ public interface TranslateScenesAssistant {
 
     @SystemMessage("{{systemMessage}}")
     @UserMessage("{{userMessage}}")
-    TravelResponse translate(@MemoryId String sessionId, @V("systemMessage") String systemMessage, @V("userMessage") String userMessage);
+    SceneTranslationResponse translate(@MemoryId String sessionId, @V("systemMessage") String systemMessage, @V("userMessage") String userMessage);
 }

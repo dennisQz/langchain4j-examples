@@ -21,12 +21,12 @@ public class LanguageModelSelectionStrategy implements ModelSelectionStrategy {
 
     @Override
     public String selectModel(String targetLanguage, String nativeLanguage) {
-        if (isChinese(targetLanguage) || isChinese(nativeLanguage)) {
-            return MODEL_QWEN;
-        } else {
-            return MODEL_ZHIPU;
-        }
-        // if (isEnglish(targetLanguage) || isEnglish(nativeLanguage)) 
+        return MODEL_QWEN;
+        // if (isChinese(targetLanguage) || isChinese(nativeLanguage)) {
+        //     return MODEL_QWEN;
+        // } else if (isEnglish(targetLanguage) || isEnglish(nativeLanguage)) {
+        //     return MODEL_ZHIPU;
+        // } 
         // return MODEL_OPENAI;
     }
 

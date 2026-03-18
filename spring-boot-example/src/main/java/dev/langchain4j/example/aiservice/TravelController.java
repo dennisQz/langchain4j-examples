@@ -1,6 +1,8 @@
 package dev.langchain4j.example.aiservice;
 
 import dev.langchain4j.example.aiservice.common.ApiResponse;
+import dev.langchain4j.example.aiservice.model.SceneTranslationResponse;
+import dev.langchain4j.example.aiservice.model.TravelPhrase;
 import dev.langchain4j.example.aiservice.model.TravelRequest;
 import dev.langchain4j.example.aiservice.model.TravelResponse;
 import dev.langchain4j.example.configuration.ModelSelector;
@@ -103,9 +105,18 @@ public class TravelController {
         String userMessage = template.apply(variables).text();
 
         String translationSessionId = sessionId + "_translate";
-        TravelResponse response = translateScenesAssistant.translate(translationSessionId, systemMessage, userMessage);
+        SceneTranslationResponse sceneResponse = translateScenesAssistant.translate(translationSessionId, systemMessage, userMessage);
 
         ephemeralChatMemoryProvider.get(translationSessionId).clear();
+
+        TravelResponse response = new TravelResponse();
+        response.setMessage(sceneResponse.getMessage());
+        response.setStartWords(sceneResponse.getStartWords());
+        if (sceneResponse.getPhrases() != null) {
+            response.setPhrases(sceneResponse.getPhrases().stream()
+                    .map(p -> new TravelPhrase(p.getOriginal(), p.getTranslated()))
+                    .toList());
+        }
 
         if (response.getMessage() != null && !response.getMessage().isEmpty() && (response.getPhrases() == null || response.getPhrases().isEmpty())) {
             return ApiResponse.error(500, response);
