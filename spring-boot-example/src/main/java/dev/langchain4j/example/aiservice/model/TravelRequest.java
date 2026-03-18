@@ -2,6 +2,7 @@ package dev.langchain4j.example.aiservice.model;
 
 public class TravelRequest {
     private String scene;
+    private String sceneId;
     private String targetLanguage;
     private String nativeLanguage;
     private String sessionId;
@@ -9,8 +10,9 @@ public class TravelRequest {
     public TravelRequest() {
     }
 
-    public TravelRequest(String scene, String targetLanguage, String nativeLanguage, String sessionId) {
+    public TravelRequest(String scene, String sceneId, String targetLanguage, String nativeLanguage, String sessionId) {
         this.scene = scene;
+        this.sceneId = sceneId;
         this.targetLanguage = targetLanguage;
         this.nativeLanguage = nativeLanguage;
         this.sessionId = sessionId;
@@ -22,6 +24,14 @@ public class TravelRequest {
 
     public void setScene(String scene) {
         this.scene = scene;
+    }
+
+    public String getSceneId() {
+        return sceneId;
+    }
+
+    public void setSceneId(String sceneId) {
+        this.sceneId = sceneId;
     }
 
     public String getTargetLanguage() {

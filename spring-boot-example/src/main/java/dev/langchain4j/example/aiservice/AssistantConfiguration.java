@@ -93,6 +93,11 @@ public class AssistantConfiguration {
     }
 
     @Bean
+    ChatMemoryProvider ephemeralChatMemoryProvider() {
+        return memoryId -> MessageWindowChatMemory.withMaxMessages(10);
+    }
+
+    @Bean
     ChatModelListener chatModelListener() {
         return new MyChatModelListener();
     }

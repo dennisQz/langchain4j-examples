@@ -23,10 +23,11 @@ public class LanguageModelSelectionStrategy implements ModelSelectionStrategy {
     public String selectModel(String targetLanguage, String nativeLanguage) {
         if (isChinese(targetLanguage) || isChinese(nativeLanguage)) {
             return MODEL_QWEN;
-        } else if (isEnglish(targetLanguage) || isEnglish(nativeLanguage)) {
+        } else {
             return MODEL_ZHIPU;
         }
-        return MODEL_OPENAI;
+        // if (isEnglish(targetLanguage) || isEnglish(nativeLanguage)) 
+        // return MODEL_OPENAI;
     }
 
     private boolean isChinese(String language) {
