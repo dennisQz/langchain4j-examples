@@ -83,7 +83,7 @@ public class AssistantConfiguration {
                 }
             }
 
-            ChatMemory chatMemory = MessageWindowChatMemory.withMaxMessages(3);
+            ChatMemory chatMemory = MessageWindowChatMemory.withMaxMessages(1);
             for (ChatMessage message : messages) {
                 chatMemory.add(message);
             }
@@ -94,7 +94,7 @@ public class AssistantConfiguration {
 
     @Bean
     ChatMemoryProvider ephemeralChatMemoryProvider() {
-        return memoryId -> MessageWindowChatMemory.withMaxMessages(10);
+        return memoryId -> MessageWindowChatMemory.withMaxMessages(1);
     }
 
     @Bean
