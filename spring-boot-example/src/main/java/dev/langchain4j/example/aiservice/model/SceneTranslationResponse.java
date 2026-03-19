@@ -5,18 +5,13 @@ import java.util.List;
 public class SceneTranslationResponse {
     private List<SceneTranslationPhrase> phrases;
     private List<String> intentions;
-    private String message;
-    private String startWords;
+    private List<String> fixedTextList;
 
     public SceneTranslationResponse() {
     }
 
     public SceneTranslationResponse(List<SceneTranslationPhrase> phrases) {
         this.phrases = phrases;
-    }
-
-    public SceneTranslationResponse(String message) {
-        this.message = message;
     }
 
     public List<SceneTranslationPhrase> getPhrases() {
@@ -35,19 +30,11 @@ public class SceneTranslationResponse {
         this.intentions = intentions;
     }
 
-    public String getMessage() {
-        return message;
+    public List<String> getFixedTextList() {
+        return fixedTextList;
     }
 
-    public void setMessage(String message) {
-        this.message = message;
-    }
-
-    public String getStartWords() {
-        return startWords;
-    }
-
-    public void setStartWords(String startWords) {
-        this.startWords = startWords;
+    public void setFixedTextList(List<String> fixedTextList) {
+        this.fixedTextList = fixedTextList;
     }
 }

@@ -6,7 +6,7 @@ public class TravelResponse {
     private List<TravelPhrase> phrases;
     private List<String> intentions;
     private String message;
-    private String startWords;
+    private List<String> fixedTextList;
 
     public TravelResponse() {
     }
@@ -43,11 +43,11 @@ public class TravelResponse {
         this.message = message;
     }
 
-    public String getStartWords() {
-        return startWords;
+    public List<String> getFixedTextList() {
+        return fixedTextList;
     }
 
-    public void setStartWords(String startWords) {
-        this.startWords = startWords;
+    public void setFixedTextList(List<String> fixedTextList) {
+        this.fixedTextList = fixedTextList;
     }
 }

@@ -91,7 +91,9 @@ class TravelControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(200))
                 .andExpect(jsonPath("$.data.phrases[0].original").value("Hello"))
-                .andExpect(jsonPath("$.data.phrases[0].translated").value("Bonjour"));
+                .andExpect(jsonPath("$.data.phrases[0].translated").value("Bonjour"))
+                .andExpect(jsonPath("$.data.fixedTextList").isArray())
+                .andExpect(jsonPath("$.data.fixedTextList[0]").value("您能为我提供我可以在Paris使用的10个常用短语吗?"));
     }
 
     @Test
@@ -125,8 +127,8 @@ class TravelControllerTest {
     }
 
     @Test
-    void testChatWithPhonetic() throws Exception {
-        TravelPhrase phrase = new TravelPhrase("Hello", "你好", "Ni Hao");
+    void testChatWithChinese() throws Exception {
+        TravelPhrase phrase = new TravelPhrase("Hello", "你好");
         TravelResponse response = new TravelResponse(List.of(phrase));
 
         given(travelAssistant.chat(eq("default"), eq("System Prompt"), anyString())).willReturn(response);
@@ -137,8 +139,7 @@ class TravelControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(200))
                 .andExpect(jsonPath("$.data.phrases[0].original").value("Hello"))
-                .andExpect(jsonPath("$.data.phrases[0].translated").value("你好"))
-                .andExpect(jsonPath("$.data.phrases[0].phonetic").value("Ni Hao"));
+                .andExpect(jsonPath("$.data.phrases[0].translated").value("你好"));
     }
 
     @Test
@@ -162,7 +163,8 @@ class TravelControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(200))
                 .andExpect(jsonPath("$.data.phrases[0].original").value("Do you have a reservation?"))
-                .andExpect(jsonPath("$.data.phrases[0].translated").value("すみません、ご予約はありますか？"));
+                .andExpect(jsonPath("$.data.phrases[0].translated").value("すみません、ご予約はありますか？"))
+                .andExpect(jsonPath("$.data.fixedTextList").isArray());
 
         verify(ephemeralChatMemoryProvider).get("default_translate");
         verify(chatMemory).clear();

@@ -21,6 +21,7 @@ public class ScenePhraseService {
 
     private final ResourceLoader resourceLoader;
     private List<SceneInfo> scenes;
+    private List<String> defaultPhrases;
 
     public ScenePhraseService(ResourceLoader resourceLoader) {
         this.resourceLoader = resourceLoader;
@@ -39,6 +40,7 @@ public class ScenePhraseService {
             Yaml yaml = new Yaml();
             Map<String, Object> root = yaml.load(inputStream);
             
+            this.defaultPhrases = (List<String>) root.get("defaultPhrases");
             List<Map<String, Object>> sceneList = (List<Map<String, Object>>) root.get("scenes");
             scenes = new ArrayList<>();
             
@@ -48,6 +50,8 @@ public class ScenePhraseService {
                 scene.setScene((String) sceneMap.get("scene"));
                 scene.setIntentions((List<String>) sceneMap.get("intentions"));
                 scene.setPhrases((List<String>) sceneMap.get("phrases"));
+                scene.setPair1((List<String>) sceneMap.get("pair1"));
+                scene.setPair2((List<String>) sceneMap.get("pair2"));
                 scenes.add(scene);
             }
             
@@ -83,6 +87,10 @@ public class ScenePhraseService {
         }
     }
 
+    public List<String> getDefaultPhrases() {
+        return defaultPhrases != null ? defaultPhrases : new ArrayList<>();
+    }
+
     public SceneInfo getSceneBySceneId(Integer sceneId) {
         if (sceneId == null) {
             return null;
@@ -101,6 +109,8 @@ public class ScenePhraseService {
         private String scene;
         private List<String> intentions;
         private List<String> phrases;
+        private List<String> pair1;
+        private List<String> pair2;
 
         public Integer getSceneId() {
             return sceneId;
@@ -132,6 +142,22 @@ public class ScenePhraseService {
 
         public void setPhrases(List<String> phrases) {
             this.phrases = phrases;
+        }
+
+        public List<String> getPair1() {
+            return pair1;
+        }
+
+        public void setPair1(List<String> pair1) {
+            this.pair1 = pair1;
+        }
+
+        public List<String> getPair2() {
+            return pair2;
+        }
+
+        public void setPair2(List<String> pair2) {
+            this.pair2 = pair2;
         }
     }
 }

@@ -9,7 +9,7 @@
 ## 现有代码结构分析
 
 1. **ScenePhraseService** - 已包含 `SceneInfo` 类，其中有 `intentions` 字段 (List<String>)
-2. **SceneTranslationResponse** - 当前包含: phrases, message, startWords
+2. **SceneTranslationResponse** - 当前包含: phrases, message
 3. **TravelResponse** - 最终返回给用户的响应模型
 4. **Prompt 模板** (user.st) - 当前只翻译 phrases
 

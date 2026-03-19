@@ -1,13 +1,8 @@
 package dev.langchain4j.example.aiservice.model;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-
 public class TravelPhrase {
     private String original;
     private String translated;
-    
-    @JsonInclude(JsonInclude.Include.NON_NULL) // 当值为 null 时不序列化该字段
-    private String phonetic;
 
     public TravelPhrase() {
     }
@@ -15,12 +10,6 @@ public class TravelPhrase {
     public TravelPhrase(String original, String translated) {
         this.original = original;
         this.translated = translated;
-    }
-
-    public TravelPhrase(String original, String translated, String phonetic) {
-        this.original = original;
-        this.translated = translated;
-        this.phonetic = phonetic;
     }
 
     public String getOriginal() {
@@ -37,13 +26,5 @@ public class TravelPhrase {
 
     public void setTranslated(String translated) {
         this.translated = translated;
-    }
-
-    public String getPhonetic() {
-        return phonetic;
-    }
-
-    public void setPhonetic(String phonetic) {
-        this.phonetic = phonetic;
     }
 }

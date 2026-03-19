@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -87,6 +88,8 @@ public class TravelController {
 
         ScenePhraseService.SceneInfo sceneInfo = scenePhraseService.getSceneBySceneId(Integer.parseInt(request.getSceneId()));
         List<String> chineseIntentions = sceneInfo != null ? sceneInfo.getIntentions() : List.of();
+        List<String> pair1 = sceneInfo != null ? sceneInfo.getPair1() : List.of();
+        List<String> pair2 = sceneInfo != null ? sceneInfo.getPair2() : List.of();
 
         String targetLanguageName = languageMappingService.getLanguageName(request.getTargetLanguage());
         String nativeLanguageName = languageMappingService.getLanguageName(request.getNativeLanguage());
@@ -95,13 +98,34 @@ public class TravelController {
 
         String systemPrompt = promptManager.loadPrompt("translate-scenes", selectedModel, "system");
         String userPromptTemplate = promptManager.loadPrompt("translate-scenes", selectedModel, "user");
+        String scene = sceneInfo != null ? sceneInfo.getScene() : "";
 
         Map<String, Object> variables = new HashMap<>();
         variables.put("phrases", String.join("\n", chinesePhrases));
         variables.put("intentions", String.join("\n", chineseIntentions));
         variables.put("targetLanguage", targetLanguageName);
         variables.put("nativeLanguage", nativeLanguageName);
-        variables.put("scene", request.getScene());
+        variables.put("scene", scene);
+        
+        List<String> defaultPhrases = scenePhraseService.getDefaultPhrases();
+        List<String> fixedTextList = new ArrayList<>();
+        if (defaultPhrases.size() >= 2) {
+            String p1 = defaultPhrases.get(0).replace("{{scene}}", scene);
+            String p2 = defaultPhrases.get(1).replace("{{scene}}", scene).replace("{{targetLanguageName}}", targetLanguageName);
+            fixedTextList.add(p1);
+            fixedTextList.add(p2);
+        }
+
+        if (pair1 != null && !pair1.isEmpty() && pair1.size() > 1) {
+            fixedTextList.add(pair1.get(0));
+            fixedTextList.add(pair1.get(1));
+        }
+        if (pair2 != null && !pair2.isEmpty() && pair2.size() > 1) {
+            fixedTextList.add(pair2.get(0));
+            fixedTextList.add(pair2.get(1));
+        }
+        variables.put("fixedTextList", String.join("\n", fixedTextList));
+
 
         PromptTemplate sysTemplate = PromptTemplate.from(systemPrompt);
         String systemMessage = sysTemplate.apply(variables).text();
@@ -115,13 +139,17 @@ public class TravelController {
         ephemeralChatMemoryProvider.get(translationSessionId).clear();
 
         TravelResponse response = new TravelResponse();
-        response.setMessage(sceneResponse.getMessage());
-        response.setStartWords(sceneResponse.getStartWords());
         response.setIntentions(sceneResponse.getIntentions());
         if (sceneResponse.getPhrases() != null) {
             response.setPhrases(sceneResponse.getPhrases().stream()
                     .map(p -> new TravelPhrase(p.getOriginal(), p.getTranslated()))
                     .toList());
+        }
+
+        if (sceneResponse.getFixedTextList() != null && !sceneResponse.getFixedTextList().isEmpty()) {
+            response.setFixedTextList(sceneResponse.getFixedTextList());
+        } else {
+            response.setFixedTextList(fixedTextList);
         }
 
         if (response.getMessage() != null && !response.getMessage().isEmpty() && (response.getPhrases() == null || response.getPhrases().isEmpty())) {
@@ -143,8 +171,10 @@ public class TravelController {
         log.info("语言映射: targetLanguage [{}] -> [{}], nativeLanguage [{}] -> [{}]",
                 request.getTargetLanguage(), targetLanguageName, request.getNativeLanguage(), nativeLanguageName);
 
+        String scene = request.getScene();
+
         Map<String, Object> variables = new HashMap<>();
-        variables.put("scene", request.getScene());
+        variables.put("scene", scene);
         variables.put("targetLanguage", targetLanguageName);
         variables.put("nativeLanguage", nativeLanguageName);
 

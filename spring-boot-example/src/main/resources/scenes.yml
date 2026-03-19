@@ -1,0 +1,37 @@
+items:
+  - img: https://img.example.com/restaurant.png
+    title: 餐厅
+    desc: 在餐厅的常用短语
+  - img: https://img.example.com/hotel.png
+    title: 酒店
+    desc: 在酒店的常用短语
+  - img: https://img.example.com/airport.png
+    title: 机场
+    desc: 在机场的常用短语
+  - img: https://img.example.com/public-transport.png
+    title: 公共交通工具
+    desc: 用于公共交通的常用短语
+  - img: https://img.example.com/attractions.png
+    title: 旅游景点
+    desc: 在旅游景点的常用短语
+  - img: https://img.example.com/taxi-ride.png
+    title: 出租车或乘车服务
+    desc: 用于出租车或乘车服务的常用短语
+  - img: https://img.example.com/pharmacy.png
+    title: 药店
+    desc: 在药店的常用短语
+  - img: https://img.example.com/emergency.png
+    title: 紧急服务
+    desc: 与紧急服务相关的常用短语
+  - img: https://img.example.com/beach-pool.png
+    title: 海滩或池畔
+    desc: 在海滩或池畔的常用短语
+  - img: https://img.example.com/local-events.png
+    title: 当地活动和节日
+    desc: 用于当地活动和节日的常用短语
+  - img: https://img.example.com/museum-gallery.png
+    title: 博物馆或美术馆
+    desc: 在博物馆或美术馆的常用短语
+  - img: https://img.example.com/cafe.png
+    title: 咖啡馆
+    desc: 在咖啡馆的常用短语
