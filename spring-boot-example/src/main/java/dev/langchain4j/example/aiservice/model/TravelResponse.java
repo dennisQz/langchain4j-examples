@@ -4,6 +4,7 @@ import java.util.List;
 
 public class TravelResponse {
     private List<TravelPhrase> phrases;
+    private List<String> intentions;
     private String message;
     private String startWords;
 
@@ -24,6 +25,14 @@ public class TravelResponse {
 
     public void setPhrases(List<TravelPhrase> phrases) {
         this.phrases = phrases;
+    }
+
+    public List<String> getIntentions() {
+        return intentions;
+    }
+
+    public void setIntentions(List<String> intentions) {
+        this.intentions = intentions;
     }
 
     public String getMessage() {

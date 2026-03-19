@@ -85,6 +85,9 @@ public class TravelController {
             return ApiResponse.error(500, response);
         }
 
+        ScenePhraseService.SceneInfo sceneInfo = scenePhraseService.getSceneBySceneId(Integer.parseInt(request.getSceneId()));
+        List<String> chineseIntentions = sceneInfo != null ? sceneInfo.getIntentions() : List.of();
+
         String targetLanguageName = languageMappingService.getLanguageName(request.getTargetLanguage());
         String nativeLanguageName = languageMappingService.getLanguageName(request.getNativeLanguage());
         log.info("语言映射: targetLanguage [{}] -> [{}], nativeLanguage [{}] -> [{}]",
@@ -95,6 +98,7 @@ public class TravelController {
 
         Map<String, Object> variables = new HashMap<>();
         variables.put("phrases", String.join("\n", chinesePhrases));
+        variables.put("intentions", String.join("\n", chineseIntentions));
         variables.put("targetLanguage", targetLanguageName);
         variables.put("nativeLanguage", nativeLanguageName);
         variables.put("scene", request.getScene());
@@ -113,6 +117,7 @@ public class TravelController {
         TravelResponse response = new TravelResponse();
         response.setMessage(sceneResponse.getMessage());
         response.setStartWords(sceneResponse.getStartWords());
+        response.setIntentions(sceneResponse.getIntentions());
         if (sceneResponse.getPhrases() != null) {
             response.setPhrases(sceneResponse.getPhrases().stream()
                     .map(p -> new TravelPhrase(p.getOriginal(), p.getTranslated()))

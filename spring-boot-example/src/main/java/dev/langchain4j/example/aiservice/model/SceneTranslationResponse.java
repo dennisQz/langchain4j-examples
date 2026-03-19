@@ -4,6 +4,7 @@ import java.util.List;
 
 public class SceneTranslationResponse {
     private List<SceneTranslationPhrase> phrases;
+    private List<String> intentions;
     private String message;
     private String startWords;
 
@@ -24,6 +25,14 @@ public class SceneTranslationResponse {
 
     public void setPhrases(List<SceneTranslationPhrase> phrases) {
         this.phrases = phrases;
+    }
+
+    public List<String> getIntentions() {
+        return intentions;
+    }
+
+    public void setIntentions(List<String> intentions) {
+        this.intentions = intentions;
     }
 
     public String getMessage() {
