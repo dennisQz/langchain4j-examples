@@ -97,6 +97,7 @@ public class TravelController {
         variables.put("phrases", String.join("\n", chinesePhrases));
         variables.put("targetLanguage", targetLanguageName);
         variables.put("nativeLanguage", nativeLanguageName);
+        variables.put("scene", request.getScene());
 
         PromptTemplate sysTemplate = PromptTemplate.from(systemPrompt);
         String systemMessage = sysTemplate.apply(variables).text();
