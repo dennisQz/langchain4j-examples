@@ -9,7 +9,7 @@ import dev.langchain4j.service.spring.AiService;
 
 import static dev.langchain4j.service.spring.AiServiceWiringMode.EXPLICIT;
 
-@AiService(wiringMode = EXPLICIT, chatModel = "dynamicChatModel", chatMemoryProvider = "chatMemoryProvider")
+@AiService(wiringMode = EXPLICIT, chatModel = "dynamicChatModel", chatMemoryProvider = "statelessChatMemoryProvider")
 public interface TravelAssistant {
 
     @SystemMessage("{{systemMessage}}")

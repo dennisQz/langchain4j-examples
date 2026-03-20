@@ -6,8 +6,9 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import dev.langchain4j.data.message.*;
-import dev.langchain4j.example.configuration.entity.ChatMemoryEntity;
-import dev.langchain4j.example.configuration.repository.ChatMemoryRepository;
+import dev.langchain4j.example.configuration.entity.ChatMessageEntity;
+import dev.langchain4j.example.configuration.repository.ChatMessageRepository;
+import dev.langchain4j.example.configuration.util.SessionIdParser;
 import dev.langchain4j.memory.ChatMemory;
 import dev.langchain4j.memory.chat.ChatMemoryProvider;
 import dev.langchain4j.memory.chat.MessageWindowChatMemory;
@@ -25,11 +26,11 @@ public class AssistantConfiguration {
 
     private static final Logger log = LoggerFactory.getLogger(AssistantConfiguration.class);
 
-    private final ChatMemoryRepository chatMemoryRepository;
+    private final ChatMessageRepository chatMessageRepository;
     private final ObjectMapper objectMapper;
 
-    public AssistantConfiguration(ChatMemoryRepository chatMemoryRepository) {
-        this.chatMemoryRepository = chatMemoryRepository;
+    public AssistantConfiguration(ChatMessageRepository chatMessageRepository) {
+        this.chatMessageRepository = chatMessageRepository;
         this.objectMapper = createObjectMapper();
     }
 
@@ -70,25 +71,29 @@ public class AssistantConfiguration {
     ChatMemoryProvider chatMemoryProvider() {
         return memoryId -> {
             String sessionId = String.valueOf(memoryId);
-            ChatMemoryEntity entity = chatMemoryRepository.findBySessionId(sessionId).orElse(null);
+            List<ChatMessageEntity> entities = chatMessageRepository.findBySessionIdOrderByMessageOrderAsc(sessionId);
 
             List<ChatMessage> messages = new ArrayList<>();
-            if (entity != null && entity.getChatMemoryJson() != null && !entity.getChatMemoryJson().isEmpty()) {
+            for (ChatMessageEntity entity : entities) {
                 try {
-                    messages = objectMapper.readValue(entity.getChatMemoryJson(), new TypeReference<List<ChatMessage>>() {});
-                    log.info("Loaded {} messages from database for session: {}", messages.size(), sessionId);
+                    ChatMessage message = objectMapper.readValue(entity.getMessageJson(), ChatMessage.class);
+                    messages.add(message);
                 } catch (JsonProcessingException e) {
-                    log.warn("Failed to deserialize chat memory for session: {}, will start with empty memory. Error: {}", sessionId, e.getMessage());
-                    messages = new ArrayList<>();
+                    log.warn("Failed to deserialize chat message for session: {}, order: {}, error: {}", 
+                        sessionId, entity.getMessageOrder(), e.getMessage());
                 }
             }
 
-            ChatMemory chatMemory = MessageWindowChatMemory.withMaxMessages(1);
+            if (!messages.isEmpty()) {
+                log.info("Loaded {} messages from database for session: {}", messages.size(), sessionId);
+            }
+
+            ChatMemory chatMemory = MessageWindowChatMemory.withMaxMessages(3);
             for (ChatMessage message : messages) {
                 chatMemory.add(message);
             }
 
-            return new PersistentChatMemoryWrapper(chatMemory, sessionId, chatMemoryRepository, objectMapper);
+            return new PersistentChatMemoryWrapper(chatMemory, sessionId, chatMessageRepository, objectMapper, messages.size());
         };
     }
 
@@ -106,15 +111,17 @@ public class AssistantConfiguration {
 
         private final ChatMemory delegate;
         private final String sessionId;
-        private final ChatMemoryRepository repository;
+        private final ChatMessageRepository repository;
         private final ObjectMapper objectMapper;
+        private int lastSavedCount;
 
         public PersistentChatMemoryWrapper(ChatMemory delegate, String sessionId,
-                                           ChatMemoryRepository repository, ObjectMapper objectMapper) {
+                                           ChatMessageRepository repository, ObjectMapper objectMapper, int initialCount) {
             this.delegate = delegate;
             this.sessionId = sessionId;
             this.repository = repository;
             this.objectMapper = objectMapper;
+            this.lastSavedCount = initialCount;
         }
 
         @Override
@@ -136,20 +143,100 @@ public class AssistantConfiguration {
         @Override
         public void clear() {
             delegate.clear();
-            persist();
+            repository.deleteBySessionId(sessionId);
+            lastSavedCount = 0;
+            log.debug("Cleared chat memory for session: {}", sessionId);
         }
 
         private void persist() {
+            List<ChatMessage> currentMessages = delegate.messages();
+            if (currentMessages.size() <= lastSavedCount) {
+                return; // Nothing new to save
+            }
+
+            SessionIdParser.SessionInfo sessionInfo = SessionIdParser.parse(sessionId);
+
+            for (int i = lastSavedCount; i < currentMessages.size(); i++) {
+                ChatMessage message = currentMessages.get(i);
+                try {
+                    String json = objectMapper.writeValueAsString(message);
+                    ChatMessageEntity entity = new ChatMessageEntity();
+                    entity.setSessionId(sessionId);
+                    entity.setDeviceId(sessionInfo.deviceId());
+                    entity.setSceneId(sessionInfo.sceneId());
+                    entity.setMessageJson(json);
+                    entity.setMessageType(message.type().name());
+                    entity.setMessageOrder(i);
+                    
+                    repository.save(entity);
+                } catch (JsonProcessingException e) {
+                    log.error("Failed to serialize chat message for session: {}, order: {}", sessionId, i, e);
+                }
+            }
+            lastSavedCount = currentMessages.size();
+            log.debug("Persisted new messages up to order {} for session: {}", lastSavedCount - 1, sessionId);
+        }
+    }
+
+    @Bean
+    ChatMemoryProvider statelessChatMemoryProvider() {
+        return memoryId -> {
+            String sessionId = String.valueOf(memoryId);
+            return new StatelessPersistentChatMemory(sessionId, chatMessageRepository, objectMapper);
+        };
+    }
+
+    private static class StatelessPersistentChatMemory implements ChatMemory {
+        private final String sessionId;
+        private final ChatMessageRepository repository;
+        private final ObjectMapper objectMapper;
+        private final ChatMemory delegate = MessageWindowChatMemory.withMaxMessages(1);
+
+        public StatelessPersistentChatMemory(String sessionId, ChatMessageRepository repository, ObjectMapper objectMapper) {
+            this.sessionId = sessionId;
+            this.repository = repository;
+            this.objectMapper = objectMapper;
+        }
+
+        @Override
+        public String id() {
+            return sessionId;
+        }
+
+        @Override
+        public List<ChatMessage> messages() {
+            return delegate.messages();
+        }
+
+        @Override
+        public void add(ChatMessage message) {
+            delegate.add(message);
+            persist(message);
+        }
+
+        @Override
+        public void clear() {
+            delegate.clear();
+            // repository.deleteBySessionId(sessionId);
+        }
+
+        private void persist(ChatMessage message) {
             try {
-                String json = objectMapper.writeValueAsString(delegate.messages());
-                ChatMemoryEntity entity = repository.findBySessionId(sessionId)
-                        .orElse(new ChatMemoryEntity());
+                String json = objectMapper.writeValueAsString(message);
+                SessionIdParser.SessionInfo sessionInfo = SessionIdParser.parse(sessionId);
+
+                ChatMessageEntity entity = new ChatMessageEntity();
                 entity.setSessionId(sessionId);
-                entity.setChatMemoryJson(json);
+                entity.setDeviceId(sessionInfo.deviceId());
+                entity.setSceneId(sessionInfo.sceneId());
+                entity.setMessageJson(json);
+                entity.setMessageType(message.type().name());
+                entity.setMessageOrder(repository.countBySessionId(sessionId).intValue());
+
                 repository.save(entity);
-                log.debug("Persisted chat memory for session: {}", sessionId);
+                log.debug("Persisted message for session: {}", sessionId);
             } catch (JsonProcessingException e) {
-                log.error("Failed to serialize chat memory for session: {}", sessionId, e);
+                log.error("Failed to serialize chat message for session: {}", sessionId, e);
             }
         }
     }
