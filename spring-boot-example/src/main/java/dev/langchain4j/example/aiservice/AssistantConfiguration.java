@@ -158,6 +158,11 @@ public class AssistantConfiguration {
 
             for (int i = lastSavedCount; i < currentMessages.size(); i++) {
                 ChatMessage message = currentMessages.get(i);
+                
+                // 跳过系统消息，不存储到数据库
+                if (message.type() == ChatMessageType.SYSTEM) {
+                    continue;
+                }
                 try {
                     String json = objectMapper.writeValueAsString(message);
                     ChatMessageEntity entity = new ChatMessageEntity();
@@ -222,6 +227,10 @@ public class AssistantConfiguration {
 
         private void persist(ChatMessage message) {
             try {
+                // 跳过系统消息，不存储到数据库
+                if (message.type() == ChatMessageType.SYSTEM) {
+                    return;
+                }
                 String json = objectMapper.writeValueAsString(message);
                 SessionIdParser.SessionInfo sessionInfo = SessionIdParser.parse(sessionId);
 
