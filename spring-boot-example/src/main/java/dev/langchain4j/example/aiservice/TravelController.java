@@ -183,11 +183,11 @@ public class TravelController {
         if (defaultPhrases.size() >= 2) {
             // String p1 = defaultPhrases.get(0).replace("{{scene}}", scene);
             String p2 = defaultPhrases.get(1).replace("{{scene}}", scene).replace("{{targetLanguageName}}", targetLanguageName);
-            fixedTextList.add("你好");
-            fixedTextList.add(p2);
+            fixedTextList.add("\"你好\"");
+            fixedTextList.add("\"" + p2 + "\"");
         }
        
-        variables.put("fixedTextList", String.join("\n", fixedTextList));
+        variables.put("fixedTextList", String.join(",", fixedTextList));
 
         PromptTemplate sysTemplate = PromptTemplate.from(systemPrompt);
         String systemMessage = sysTemplate.apply(variables).text();

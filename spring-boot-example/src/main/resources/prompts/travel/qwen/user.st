@@ -7,8 +7,7 @@
 如果场景具体明确，则执行以下任务：
 
 1. **固定词条翻译**：
-    - 将固定词条中内容翻译成{{nativeLanguage}};
-    - 将翻译结果作为JSON的顶级字段 'fixedTextList' 返回，不要放在phrases数组中。
+    - 使用{{nativeLanguage}}翻译[{{fixedTextList}}]，将翻译结果作为JSON的顶级字段 'fixedTextList' 返回，不要放在phrases数组中。
 2. **生成常用语**：
     - 基于场景【{{scene}}】生成6条【{{nativeLanguage}}】常用语，并翻译为【{{targetLanguage}}】。
     - 生成的常用语对应phrases中original，翻译后的常用语对应phrases中translated
@@ -17,6 +16,3 @@
     - 意图描述应使用【{{nativeLanguage}}】，且表达要简洁、地道（例如：“寻求医疗协助”、“询问商品价格”）。
     - 将结果作为 JSON 顶层字段 `intentions`（字符串数组）返回。
 4. **message字段**：此时必须返回空的message（空字符串""）
-
-固定词条：
-{{fixedTextList}}
