@@ -1,4 +1,4 @@
-package dev.langchain4j.example.configuration.entity;
+package dev.langchain4j.example.config.entity;
 
 import jakarta.persistence.*;
 import java.time.LocalDateTime;

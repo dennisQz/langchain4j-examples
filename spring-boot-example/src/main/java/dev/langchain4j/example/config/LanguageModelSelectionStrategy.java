@@ -1,10 +1,10 @@
-package dev.langchain4j.example.service;
+package dev.langchain4j.example.config;
 
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
 import java.util.Set;
 
-@Service
+@Component
 public class LanguageModelSelectionStrategy implements ModelSelectionStrategy {
 
     private static final String MODEL_QWEN = "qwen";
@@ -22,12 +22,6 @@ public class LanguageModelSelectionStrategy implements ModelSelectionStrategy {
     @Override
     public String selectModel(String targetLanguage, String nativeLanguage) {
         return MODEL_QWEN;
-        // if (isChinese(targetLanguage) || isChinese(nativeLanguage)) {
-        //     return MODEL_QWEN;
-        // } else if (isEnglish(targetLanguage) || isEnglish(nativeLanguage)) {
-        //     return MODEL_ZHIPU;
-        // } 
-        // return MODEL_OPENAI;
     }
 
     private boolean isChinese(String language) {

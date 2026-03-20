@@ -1,5 +1,7 @@
-package dev.langchain4j.example.aiservice;
+package dev.langchain4j.example.controller;
 
+import dev.langchain4j.example.aiservice.Assistant;
+import dev.langchain4j.example.aiservice.StreamingAssistant;
 import dev.langchain4j.service.spring.AiService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -8,9 +10,6 @@ import reactor.core.publisher.Flux;
 
 import static org.springframework.http.MediaType.TEXT_EVENT_STREAM_VALUE;
 
-/**
- * This is an example of using an {@link AiService}, a high-level LangChain4j API.
- */
 @RestController
 public class AssistantController {
 

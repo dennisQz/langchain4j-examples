@@ -1,4 +1,4 @@
-package dev.langchain4j.example.configuration;
+package dev.langchain4j.example.config;
 
 import dev.langchain4j.model.chat.StreamingChatModel;
 import dev.langchain4j.model.chat.request.ChatRequest;
@@ -25,7 +25,6 @@ public class DynamicStreamingChatModel implements StreamingChatModel {
         return model;
     }
 
-    // For newer LangChain4j versions
     @Override
     public void chat(ChatRequest chatRequest, StreamingChatResponseHandler handler) {
         getCurrentModel().chat(chatRequest, handler);

@@ -1,4 +1,4 @@
-package dev.langchain4j.example.configuration.util;
+package dev.langchain4j.example.config.util;
 
 public class SessionIdParser {
 

@@ -1,13 +1,15 @@
-package dev.langchain4j.example.aiservice;
+package dev.langchain4j.example.controller;
 
-import dev.langchain4j.example.aiservice.common.ApiResponse;
+import dev.langchain4j.example.aiservice.TravelAssistant;
+import dev.langchain4j.example.aiservice.TranslateScenesAssistant;
 import dev.langchain4j.example.aiservice.model.SceneTranslationResponse;
 import dev.langchain4j.example.aiservice.model.TravelPhrase;
 import dev.langchain4j.example.aiservice.model.TravelRequest;
 import dev.langchain4j.example.aiservice.model.TravelResponse;
-import dev.langchain4j.example.configuration.ModelSelector;
+import dev.langchain4j.example.common.ApiResponse;
+import dev.langchain4j.example.config.ModelSelector;
 import dev.langchain4j.example.service.LanguageMappingService;
-import dev.langchain4j.example.service.ModelSelectionStrategy;
+import dev.langchain4j.example.config.ModelSelectionStrategy;
 import dev.langchain4j.example.service.PromptManager;
 import dev.langchain4j.example.service.ScenePhraseService;
 import dev.langchain4j.memory.ChatMemory;

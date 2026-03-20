@@ -1,4 +1,4 @@
-package dev.langchain4j.example.aiservice.common;
+package dev.langchain4j.example.common;
 
 public class ApiResponse<T> {
     private int code;

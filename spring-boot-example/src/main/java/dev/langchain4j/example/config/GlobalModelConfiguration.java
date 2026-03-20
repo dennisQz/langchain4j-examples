@@ -1,4 +1,4 @@
-package dev.langchain4j.example.configuration;
+package dev.langchain4j.example.config;
 
 import dev.langchain4j.community.model.dashscope.QwenChatModel;
 import dev.langchain4j.community.model.dashscope.QwenStreamingChatModel;

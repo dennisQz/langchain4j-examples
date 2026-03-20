@@ -1,6 +1,6 @@
 package dev.langchain4j.example.controller;
 
-import dev.langchain4j.example.configuration.ModelSelector;
+import dev.langchain4j.example.config.ModelSelector;
 import org.springframework.web.bind.annotation.*;
 
 @RestController

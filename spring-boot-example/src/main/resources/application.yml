@@ -49,7 +49,7 @@ app:
     qwen:
       api-key: ${QWEN_API_KEY:}
       model-name: qwen-turbo # qwen-plus or qwen-turbo
-      max-tokens: 2000
+      max-tokens: 4096
     zhipu:
       api-key: ${ZHIPU_API_KEY:}
       model-name: glm-4.7

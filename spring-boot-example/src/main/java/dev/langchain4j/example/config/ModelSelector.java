@@ -1,4 +1,4 @@
-package dev.langchain4j.example.configuration;
+package dev.langchain4j.example.config;
 
 import java.util.concurrent.atomic.AtomicReference;
 

@@ -1,4 +1,4 @@
-package dev.langchain4j.example.configuration;
+package dev.langchain4j.example.config;
 
 import dev.langchain4j.model.chat.ChatModel;
 import dev.langchain4j.model.chat.request.ChatRequest;
@@ -30,7 +30,6 @@ public class DynamicChatModel implements ChatModel {
         return getCurrentModel().chat(userMessage);
     }
     
-    // For newer LangChain4j versions
     @Override
     public ChatResponse chat(ChatRequest chatRequest) {
         return getCurrentModel().chat(chatRequest);

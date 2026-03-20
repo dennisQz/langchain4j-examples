@@ -1,6 +1,6 @@
-package dev.langchain4j.example.configuration.repository;
+package dev.langchain4j.example.config.repository;
 
-import dev.langchain4j.example.configuration.entity.ChatMessageEntity;
+import dev.langchain4j.example.config.entity.ChatMessageEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;

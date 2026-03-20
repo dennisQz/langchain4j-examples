@@ -1,4 +1,4 @@
-package dev.langchain4j.example.aiservice.common;
+package dev.langchain4j.example.common;
 
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
