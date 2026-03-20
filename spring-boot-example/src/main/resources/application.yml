@@ -6,7 +6,7 @@ spring:
   datasource:
     url: jdbc:mysql://localhost:3306/langchain_chat?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
     username: root
-    password: root123456
+    password: ${DB_PASSWORD:root123456}
     driver-class-name: com.mysql.cj.jdbc.Driver
   jpa:
     hibernate:
@@ -44,13 +44,13 @@ app:
   model:
     current: qwen
     openai:
-      api-key: sk-808701fbaed240688aaf3a075dad0a6b
+      api-key: ${OPENAI_API_KEY:}
       model-name: gpt-4o-mini
     qwen:
-      api-key: sk-808701fbaed240688aaf3a075dad0a6b
+      api-key: ${QWEN_API_KEY:}
       model-name: qwen-turbo # qwen-plus or qwen-turbo
       max-tokens: 2000
     zhipu:
-      api-key: 0e9386d0c9c94ba5a1b5152ab7b5201d.kDinpqEd2QjwwTo7
+      api-key: ${ZHIPU_API_KEY:}
       model-name: glm-4.7
       max-tokens: 4096
