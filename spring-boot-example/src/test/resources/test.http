@@ -23,7 +23,20 @@ Content-Type: application/json
   "scene": "Restaurant",
   "targetLanguage": "Spanish",
   "nativeLanguage": "English",
-  "sessionId": "traveler1"
+  "sessionId": "abc123def456"
+}
+
+### High Level API: Travel Assistant with first=1 (SceneId Request)
+POST http://localhost:8082/travel/assistant
+Content-Type: application/json
+
+{
+  "first": 1,
+  "deviceId": "device001",
+  "sceneId": "1",
+  "targetLanguage": "Japanese",
+  "nativeLanguage": "English",
+  "sessionId": "abc123def456"
 }
 
 ### High Level API: Travel Assistant (Unclear Scenario / Error)
@@ -42,5 +55,5 @@ Content-Type: application/json
   "scene": "Unclear",
   "targetLanguage": "Spanish",
   "nativeLanguage": "English",
-  "sessionId": "traveler2"
+  "sessionId": "abc123def456"
 }

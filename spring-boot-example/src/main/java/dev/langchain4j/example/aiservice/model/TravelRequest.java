@@ -6,16 +6,20 @@ public class TravelRequest {
     private String targetLanguage;
     private String nativeLanguage;
     private String sessionId;
+    private Integer first;
+    private String deviceId;
 
     public TravelRequest() {
     }
 
-    public TravelRequest(String scene, String sceneId, String targetLanguage, String nativeLanguage, String sessionId) {
+    public TravelRequest(String scene, String sceneId, String targetLanguage, String nativeLanguage, String sessionId, Integer first, String deviceId) {
         this.scene = scene;
         this.sceneId = sceneId;
         this.targetLanguage = targetLanguage;
         this.nativeLanguage = nativeLanguage;
         this.sessionId = sessionId;
+        this.first = first;
+        this.deviceId = deviceId;
     }
 
     public String getScene() {
@@ -56,5 +60,21 @@ public class TravelRequest {
 
     public void setSessionId(String sessionId) {
         this.sessionId = sessionId;
+    }
+
+    public Integer getFirst() {
+        return first;
+    }
+
+    public void setFirst(Integer first) {
+        this.first = first;
+    }
+
+    public String getDeviceId() {
+        return deviceId;
+    }
+
+    public void setDeviceId(String deviceId) {
+        this.deviceId = deviceId;
     }
 }

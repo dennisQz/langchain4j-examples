@@ -206,4 +206,28 @@ class TravelControllerTest {
         verify(ephemeralChatMemoryProvider).get("mysession_translate");
         verify(chatMemory).clear();
     }
+
+    @Test
+    void testChatWithFirstParameter() throws Exception {
+        List<String> chinesePhrases = Arrays.asList(
+                "请问有预订吗",
+                "请给我们一张桌子，两位"
+        );
+
+        given(scenePhraseService.getPhrasesBySceneId("1")).willReturn(chinesePhrases);
+
+        SceneTranslationPhrase phrase = new SceneTranslationPhrase("Do you have a reservation?", "すみません、ご予約はありますか？");
+        SceneTranslationResponse response = new SceneTranslationResponse(List.of(phrase));
+
+        given(translateScenesAssistant.translate(eq("device123_translate"), eq("Translate System Prompt"), anyString())).willReturn(response);
+
+        mockMvc.perform(post("/travel/assistant")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{\"first\": 1, \"deviceId\": \"device123\", \"sceneId\": \"1\", \"targetLanguage\": \"Japanese\", \"nativeLanguage\": \"English\"}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value(200));
+
+        verify(ephemeralChatMemoryProvider).get("device123_translate");
+        verify(chatMemory).clear();
+    }
 }
