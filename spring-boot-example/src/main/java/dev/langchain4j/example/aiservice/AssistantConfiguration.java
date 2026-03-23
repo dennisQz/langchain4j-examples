@@ -6,9 +6,9 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import dev.langchain4j.data.message.*;
+import dev.langchain4j.example.config.RequestContext;
 import dev.langchain4j.example.config.entity.ChatMessageEntity;
 import dev.langchain4j.example.config.repository.ChatMessageRepository;
-import dev.langchain4j.example.config.util.SessionIdParser;
 import dev.langchain4j.memory.ChatMemory;
 import dev.langchain4j.memory.chat.ChatMemoryProvider;
 import dev.langchain4j.memory.chat.MessageWindowChatMemory;
@@ -107,6 +107,17 @@ public class AssistantConfiguration {
         return new MyChatModelListener();
     }
 
+    private static int parseIntOrDefault(String value, int defaultValue) {
+        if (value == null || value.isEmpty()) {
+            return defaultValue;
+        }
+        try {
+            return Integer.parseInt(value);
+        } catch (NumberFormatException e) {
+            return defaultValue;
+        }
+    }
+
     private static class PersistentChatMemoryWrapper implements ChatMemory {
 
         private final ChatMemory delegate;
@@ -151,15 +162,17 @@ public class AssistantConfiguration {
         private void persist() {
             List<ChatMessage> currentMessages = delegate.messages();
             if (currentMessages.size() <= lastSavedCount) {
-                return; // Nothing new to save
+                return;
             }
 
-            SessionIdParser.SessionInfo sessionInfo = SessionIdParser.parse(sessionId);
+            String deviceId = RequestContext.getDeviceId();
+            Integer sceneId = RequestContext.getSceneId();
+            if (deviceId == null) deviceId = "default";
+            if (sceneId == null) sceneId = 0;
 
             for (int i = lastSavedCount; i < currentMessages.size(); i++) {
                 ChatMessage message = currentMessages.get(i);
-                
-                // 跳过系统消息，不存储到数据库
+
                 if (message.type() == ChatMessageType.SYSTEM) {
                     continue;
                 }
@@ -167,12 +180,12 @@ public class AssistantConfiguration {
                     String json = objectMapper.writeValueAsString(message);
                     ChatMessageEntity entity = new ChatMessageEntity();
                     entity.setSessionId(sessionId);
-                    entity.setDeviceId(sessionInfo.deviceId());
-                    entity.setSceneId(sessionInfo.sceneId());
+                    entity.setDeviceId(deviceId);
+                    entity.setSceneId(sceneId);
                     entity.setMessageJson(json);
                     entity.setMessageType(message.type().name());
                     entity.setMessageOrder(i);
-                    
+
                     repository.save(entity);
                 } catch (JsonProcessingException e) {
                     log.error("Failed to serialize chat message for session: {}, order: {}", sessionId, i, e);
@@ -227,17 +240,20 @@ public class AssistantConfiguration {
 
         private void persist(ChatMessage message) {
             try {
-                // 跳过系统消息，不存储到数据库
                 if (message.type() == ChatMessageType.SYSTEM) {
                     return;
                 }
                 String json = objectMapper.writeValueAsString(message);
-                SessionIdParser.SessionInfo sessionInfo = SessionIdParser.parse(sessionId);
+
+                String deviceId = RequestContext.getDeviceId();
+                Integer sceneId = RequestContext.getSceneId();
+                if (deviceId == null) deviceId = "default";
+                if (sceneId == null) sceneId = 0;
 
                 ChatMessageEntity entity = new ChatMessageEntity();
                 entity.setSessionId(sessionId);
-                entity.setDeviceId(sessionInfo.deviceId());
-                entity.setSceneId(sessionInfo.sceneId());
+                entity.setDeviceId(deviceId);
+                entity.setSceneId(sceneId);
                 entity.setMessageJson(json);
                 entity.setMessageType(message.type().name());
                 entity.setMessageOrder(repository.countBySessionId(sessionId).intValue());

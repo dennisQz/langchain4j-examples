@@ -8,6 +8,7 @@ import dev.langchain4j.example.aiservice.model.TravelRequest;
 import dev.langchain4j.example.aiservice.model.TravelResponse;
 import dev.langchain4j.example.common.ApiResponse;
 import dev.langchain4j.example.config.ModelSelector;
+import dev.langchain4j.example.config.RequestContext;
 import dev.langchain4j.example.service.LanguageMappingService;
 import dev.langchain4j.example.config.ModelSelectionStrategy;
 import dev.langchain4j.example.service.PromptManager;
@@ -63,6 +64,11 @@ public class TravelController {
     @PostMapping("/travel/assistant")
     public ApiResponse<TravelResponse> chat(@RequestBody TravelRequest request) {
         String sessionId = request.getSessionId() != null ? request.getSessionId() : "default";
+        String deviceId = request.getDeviceId() != null ? request.getDeviceId() : "default";
+        Integer sceneId = request.getSceneId() != null ? Integer.parseInt(request.getSceneId()) : 0;
+
+        RequestContext.setDeviceId(deviceId);
+        RequestContext.setSceneId(sceneId);
 
         String selectedModel = modelSelectionStrategy.selectModel(request.getTargetLanguage(), request.getNativeLanguage());
         modelSelector.setContextModel(selectedModel);
@@ -75,6 +81,7 @@ public class TravelController {
             }
         } finally {
             modelSelector.clearContextModel();
+            RequestContext.clear();
         }
     }
 
