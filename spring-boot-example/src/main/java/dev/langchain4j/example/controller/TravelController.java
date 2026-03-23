@@ -10,6 +10,7 @@ import dev.langchain4j.example.common.ApiResponse;
 import dev.langchain4j.example.config.ModelSelector;
 import dev.langchain4j.example.service.LanguageMappingService;
 import dev.langchain4j.example.config.ModelSelectionStrategy;
+import dev.langchain4j.example.config.util.Md5Util;
 import dev.langchain4j.example.service.PromptManager;
 import dev.langchain4j.example.service.ScenePhraseService;
 import dev.langchain4j.memory.ChatMemory;
@@ -62,7 +63,7 @@ public class TravelController {
 
     @PostMapping("/travel/assistant")
     public ApiResponse<TravelResponse> chat(@RequestBody TravelRequest request) {
-        String sessionId = request.getSessionId() != null ? request.getSessionId() : "default";
+        String sessionId = Md5Util.encrypt(request.getSessionId() != null ? request.getSessionId() : "default");
 
         String selectedModel = modelSelectionStrategy.selectModel(request.getTargetLanguage(), request.getNativeLanguage());
         modelSelector.setContextModel(selectedModel);

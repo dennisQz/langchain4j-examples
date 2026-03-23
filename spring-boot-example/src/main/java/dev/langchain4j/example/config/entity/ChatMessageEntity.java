@@ -13,19 +13,19 @@ public class ChatMessageEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 32)
     private String sessionId;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 64)
     private String deviceId;
 
-    @Column(nullable = false)
-    private String sceneId;
+    @Column(nullable = false, columnDefinition = "TINYINT(2)")
+    private Integer sceneId;
 
     @Column(columnDefinition = "TEXT", nullable = false)
     private String messageJson;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 10)
     private String messageType;
 
     @Column(nullable = false)
@@ -63,11 +63,11 @@ public class ChatMessageEntity {
         this.deviceId = deviceId;
     }
 
-    public String getSceneId() {
+    public Integer getSceneId() {
         return sceneId;
     }
 
-    public void setSceneId(String sceneId) {
+    public void setSceneId(Integer sceneId) {
         this.sceneId = sceneId;
     }
 
